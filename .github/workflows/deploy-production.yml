@@ -1,0 +1,37 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: prod-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: gymia-fit/.github/.github/workflows/ci-node.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-business-landing
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  deploy:
+    needs: build
+    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
+    with:
+      service-name: business-landing
+      image-tag: ${{ needs.build.outputs.image-tag }}
+    secrets:
+      KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
