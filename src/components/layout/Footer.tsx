@@ -18,7 +18,7 @@ export function Footer(): React.JSX.Element {
                   sizes="40px"
                 />
               </div>
-              <span className="font-['Sora'] text-lg font-bold tracking-tight text-white" style={{ fontFamily: 'Sora, sans-serif' }}>gymia.business</span>
+              <span className="font-heading text-lg font-bold tracking-tight text-white">gymia.business</span>
             </Link>
             <p className="mt-4 text-sm text-white/50">
               Grow your gym with real demand. Capture leads, convert members, and build a stronger community.
