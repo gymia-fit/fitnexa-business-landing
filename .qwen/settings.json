@@ -7,7 +7,16 @@
       "Bash(pnpm *)",
       "Bash(del *)",
       "Bash(netstat *)",
-      "Bash(findstr *)"
+      "Bash(findstr *)",
+      "Bash(docker compose ps)",
+      "Bash(curl *)",
+      "Bash(timeout *)",
+      "Bash(git commit *)",
+      "Bash(taskkill *)",
+      "Bash(dir *)",
+      "Bash(git push)",
+      "Bash(git add *)",
+      "Bash(git checkout *)"
     ]
   },
   "$version": 3

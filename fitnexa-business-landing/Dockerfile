@@ -15,7 +15,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3005
+ENV PORT=3006
 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -24,6 +24,6 @@ COPY --from=builder /app/node_modules ./node_modules
 
 USER node
 
-EXPOSE 3005
+EXPOSE 3006
 
-CMD ["npx", "next", "start", "--port", "3005"]
+CMD ["npx", "next", "start", "--port", "3006"]
