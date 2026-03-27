@@ -1,0 +1,79 @@
+name: Build Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        type: string
+        required: true
+        description: 'Image name (e.g. fitnexa-auth-service)'
+      tag-prefix:
+        type: string
+        default: ''
+        description: 'Tag prefix (e.g. uat- or prod-)'
+      build-args:
+        type: string
+        default: ''
+        description: 'Additional Docker build args (one per line)'
+    outputs:
+      image-tag:
+        description: 'Full image tag with SHA'
+        value: ${{ jobs.build.outputs.image-tag }}
+      image-latest:
+        description: 'Full image tag with latest'
+        value: ${{ jobs.build.outputs.image-latest }}
+    secrets:
+      NPM_TOKEN:
+        required: true
+      VITE_API_URL:
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    outputs:
+      image-tag: ${{ steps.tags.outputs.sha-tag }}
+      image-latest: ${{ steps.tags.outputs.latest-tag }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate tags
+        id: tags
+        run: |
+          SHA_TAG="ghcr.io/gymia-fit/${{ inputs.image-name }}:${{ inputs.tag-prefix }}${{ github.sha }}"
+          LATEST_TAG="ghcr.io/gymia-fit/${{ inputs.image-name }}:${{ inputs.tag-prefix }}latest"
+          echo "sha-tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+          echo "latest-tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.tags.outputs.sha-tag }}
+            ${{ steps.tags.outputs.latest-tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: |
+            npm_token=${{ secrets.NPM_TOKEN }}
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            ${{ inputs.build-args }}
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.tags.outputs.latest-tag }}
+          format: table
+          exit-code: 0
+          severity: CRITICAL,HIGH

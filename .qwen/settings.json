@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(uiuxdesigning.com)",
+      "WebFetch(www.wix.com)",
+      "Bash(pnpm *)",
+      "Bash(del *)",
+      "Bash(netstat *)",
+      "Bash(findstr *)"
+    ]
+  },
+  "$version": 3
+}

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@gymia-fit/shared": ["fitnexa-shared/src/index.ts"],
+      "@gymia-fit/shared/*": ["fitnexa-shared/src/*"],
+      "@gymia-fit/nestjs-common": ["fitnexa-nestjs-common/src/index.ts"],
+      "@gymia-fit/nestjs-common/*": ["fitnexa-nestjs-common/src/*"]
+    }
+  }
+}

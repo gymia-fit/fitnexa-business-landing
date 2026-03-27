@@ -1,0 +1,81 @@
+name: Deploy Production (K3s)
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        type: string
+        required: true
+        description: 'Helm release / service name'
+      image-tag:
+        type: string
+        required: true
+        description: 'Full Docker image tag to deploy'
+      run-migrations:
+        type: boolean
+        default: false
+        description: 'Run Prisma migrations before deploy'
+    secrets:
+      KUBECONFIG:
+        required: true
+      INFRA_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          repository: gymia-fit/fitnexa-infra
+          token: ${{ secrets.INFRA_TOKEN }}
+          path: infra
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Run Prisma migrations
+        if: inputs.run-migrations
+        run: |
+          kubectl run migration-${{ inputs.service-name }}-${{ github.run_id }} \
+            --image=${{ inputs.image-tag }} \
+            --restart=Never \
+            --rm -i \
+            --namespace=fitnexa \
+            --overrides='{"spec":{"imagePullSecrets":[{"name":"ghcr-credentials"}],"containers":[{"name":"migration","image":"${{ inputs.image-tag }}","command":["npx","prisma","migrate","deploy"],"envFrom":[{"secretRef":{"name":"fitnexa-common"}},{"secretRef":{"name":"${{ inputs.service-name }}-secrets"}}]}]}}' \
+            --timeout=120s
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install ${{ inputs.service-name }} \
+            ./infra/helm/fitnexa-service \
+            --namespace=fitnexa \
+            --set image.repository=ghcr.io/gymia-fit/fitnexa-${{ inputs.service-name }} \
+            --set image.tag=$(echo "${{ inputs.image-tag }}" | rev | cut -d: -f1 | rev) \
+            -f ./infra/helm/values/${{ inputs.service-name }}.yaml \
+            --rollback-on-failure --wait --timeout=300s
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/${{ inputs.service-name }} \
+            --namespace=fitnexa --timeout=60s
+
+      - name: Debug on failure
+        if: failure()
+        run: |
+          LABEL="app.kubernetes.io/name=${{ inputs.service-name }}"
+          echo "=== Pod list ==="
+          kubectl get pods -n fitnexa -l "$LABEL" -o wide
+          echo "=== Pod events ==="
+          kubectl describe pods -n fitnexa -l "$LABEL" | tail -60
+          echo "=== Pod logs (current) ==="
+          kubectl logs -n fitnexa -l "$LABEL" --tail=80 2>/dev/null || echo "No current logs"
+          echo "=== Pod logs (previous) ==="
+          kubectl logs -n fitnexa -l "$LABEL" --tail=80 --previous 2>/dev/null || echo "No previous logs"

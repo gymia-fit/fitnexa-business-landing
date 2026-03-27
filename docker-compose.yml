@@ -1,0 +1,100 @@
+services:
+  postgres-auth:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: fitnexa
+      POSTGRES_PASSWORD: fitnexa
+      POSTGRES_DB: fitnexa_auth
+    volumes:
+      - pg_auth:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitnexa"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-gateway:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: fitnexa
+      POSTGRES_PASSWORD: fitnexa
+      POSTGRES_DB: fitnexa_gateway
+    volumes:
+      - pg_gateway:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitnexa"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-gym:
+    image: postgres:16-alpine
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: fitnexa
+      POSTGRES_PASSWORD: fitnexa
+      POSTGRES_DB: fitnexa_gym
+    volumes:
+      - pg_gym:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitnexa"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-tracker:
+    image: postgres:16-alpine
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: fitnexa
+      POSTGRES_PASSWORD: fitnexa
+      POSTGRES_DB: fitnexa_tracker
+    volumes:
+      - pg_tracker:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitnexa"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-wizard:
+    image: postgres:16-alpine
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_USER: fitnexa
+      POSTGRES_PASSWORD: fitnexa
+      POSTGRES_DB: fitnexa_wizard
+    volumes:
+      - pg_wizard:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitnexa"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pg_auth:
+  pg_gateway:
+  pg_gym:
+  pg_tracker:
+  pg_wizard:
+  redisdata:

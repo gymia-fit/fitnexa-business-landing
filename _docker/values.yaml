@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/gymia-fit/fitnexa-service
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ghcr-credentials
+
+service:
+  name: fitnexa-service
+  port: 3000
+  type: ClusterIP
+
+ingress:
+  enabled: false
+  host: ""
+  path: /
+  tls: true
+  vpnOnly: false
+  annotations: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+terminationGracePeriodSeconds: 15
+
+env: {}
+
+commonSecretName: fitnexa-common
+serviceSecretName: ""
+
+configMap:
+  NODE_ENV: production
+  LOG_LEVEL: info
+
+healthCheck:
+  path: /health
+  initialDelaySeconds: 15
+  periodSeconds: 30
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+migrations:
+  enabled: false
+  command: ["npx", "prisma", "migrate", "deploy"]
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

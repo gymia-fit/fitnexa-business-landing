@@ -1,0 +1,121 @@
+At C:\projects\fitnexa-
+platform\dev.ps1:37 
+char:43
++         Write-Host " 
+ Waiting... ($waited 
+s)" -ForegroundColor 
+DarkGr ...
++                      
+                     ~
+Unexpected token 's' 
+in expression or 
+statement.
+At C:\projects\fitnexa-
+platform\dev.ps1:37 
+char:42
++         Write-Host " 
+ Waiting... ($waited 
+s)" -ForegroundColor 
+DarkGr ...
++                      
+                    ~
+Missing closing ')' in 
+expression.
+At C:\projects\fitnexa-
+platform\dev.ps1:37 
+char:44
++         Write-Host " 
+ Waiting... ($waited 
+s)" -ForegroundColor 
+DarkGr ...
++                      
+                      ~
+Unexpected token ')' 
+in expression or 
+statement.
+At C:\projects\fitnexa-
+platform\dev.ps1:42 
+char:17
++     Write-Host 
+"WARNING: Not all 
+containers healthy 
+after ${maxWait}s ...
++                 
+~~~~~~~~
+Unexpected token 
+'WARNING:' in 
+expression or 
+statement.
+At C:\projects\fitnexa-
+platform\dev.ps1:128 
+char:37
++ $jobs | 
+ForEach-Object { 
+"$($_.pid)|$($_.name)" 
+} | Set-Content $pidF 
+...
++                      
+               
+~~~~~~~~~~
+Expressions are only 
+allowed as the first 
+element of a pipeline.
+At C:\projects\fitnexa-
+platform\dev.ps1:128 
+char:47
++ ... bs | 
+ForEach-Object { 
+"$($_.pid)|$($_.name)" 
+} | Set-Content 
+$pidFile
++                      
+                       
+   ~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+Unexpected token '" } 
+| Set-Content $pidFile
+Write-Host ""
+Write-Host "' in 
+expression or 
+statement.
+At C:\projects\fitnexa-
+platform\dev.ps1:148 
+char:40
++ Write-Host "  Stop 
+with: .\dev-stop.ps1" 
+-ForegroundColor 
+DarkGray
++                      
+                  ~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+The string is missing 
+the terminator: ".
+At C:\projects\fitnexa-
+platform\dev.ps1:128 
+char:47
++ ... bs | 
+ForEach-Object { 
+"$($_.pid)|$($_.name)" 
+} | Set-Content 
+$pidFile
++                      
+                       
+   ~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+The assignment 
+expression is not 
+valid. The input to an 
+assignment operator 
+must be an object that 
+is able to accept 
+assignments, such as a 
+variable or a property.
+    + CategoryInfo     
+         : ParserErro  
+  r: (:) [], ParentC   
+ ontainsErrorRecord    
+Exception
+    + FullyQualifiedEr 
+   rorId : Unexpected  
+  Token
+ 

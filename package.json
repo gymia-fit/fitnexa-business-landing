@@ -1,0 +1,16 @@
+{
+  "name": "fitnexa-platform",
+  "private": true,
+  "pnpm": {
+    "overrides": {
+      "nestjs-pino": "4.6.1",
+      "pino-http": "^10.0.0",
+      "@nestjs/common": "11.1.17",
+      "@nestjs/core": "11.1.17"
+    },
+    "peerDependencyRules": {
+      "ignoreMissing": ["react", "react-dom", "eslint"],
+      "allowAny": ["nestjs-pino", "pino-http"]
+    }
+  }
+}

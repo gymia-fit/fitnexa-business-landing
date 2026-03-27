@@ -1,0 +1,86 @@
+{
+  "name": "@gymia-fit/shared",
+  "version": "1.2.4",
+  "description": "Shared types, Zod schemas, and API client for FitNexa Platform",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.mjs",
+      "require": "./dist/types/index.js"
+    },
+    "./validation": {
+      "types": "./dist/validation/index.d.ts",
+      "import": "./dist/validation/index.mjs",
+      "require": "./dist/validation/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "import": "./dist/api/index.mjs",
+      "require": "./dist/api/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "types": [
+        "dist/types/index.d.ts"
+      ],
+      "validation": [
+        "dist/validation/index.d.ts"
+      ],
+      "api": [
+        "dist/api/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "dependencies": {
+    "axios": "^1.7.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^10.0.3",
+    "globals": "^17.4.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.57.1",
+    "@vitest/coverage-v8": "^2.0.0",
+    "vitest": "^2.0.0",
+    "zod": "^3.23.0"
+  },
+  "peerDependencies": {
+    "zod": "^3.23.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ]
+  }
+}
