@@ -1,0 +1,209 @@
+name: Deploy Production (K3s)
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        type: string
+        required: true
+      image-tag:
+        type: string
+        required: true
+      run-migrations:
+        type: boolean
+        default: false
+    secrets:
+      KUBECONFIG:
+        required: true
+      INFRA_TOKEN:
+        required: true
+      # Common secrets (backend services only — not required for static frontends)
+      DATABASE_URL:
+        required: false
+      REDIS_URL:
+        required: false
+      JWT_SECRET:
+        required: false
+      SERVICE_SECRET:
+        required: false
+      # Auth service secrets
+      SMTP_HOST:
+        required: false
+      SMTP_PORT:
+        required: false
+      SMTP_SECURE:
+        required: false
+      SMTP_USER:
+        required: false
+      SMTP_PASS:
+        required: false
+      EMAIL_FROM:
+        required: false
+      APP_BASE_URL:
+        required: false
+      # Gateway secrets
+      AUTH_SERVICE_URL:
+        required: false
+      GYM_SERVICE_URL:
+        required: false
+      TRACKER_SERVICE_URL:
+        required: false
+      WIZARD_SERVICE_URL:
+        required: false
+      # Tracker service secrets
+      GEMINI_API_KEY:
+        required: false
+
+env:
+  NAMESPACE: fitnexa
+  REGISTRY: ghcr.io/gymia-fit
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: 📥 Checkout Infra
+        uses: actions/checkout@v5
+        with:
+          repository: gymia-fit/fitnexa-infra
+          token: ${{ secrets.INFRA_TOKEN }}
+          path: infra
+
+      - name: 🛠️ Setup Tools
+        uses: azure/setup-helm@v4
+
+      - name: 🔑 Configure Kubernetes
+        run: |
+          echo "::group::Configuring Kubeconfig"
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl cluster-info
+          echo "::endgroup::"
+
+      - name: 🔐 Create/Update Common Secrets
+        run: |
+          kubectl create secret generic fitnexa-common \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            --from-literal=REDIS_URL="${{ secrets.REDIS_URL }}" \
+            --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --from-literal=SERVICE_SECRET="${{ secrets.SERVICE_SECRET }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create/Update Auth Service Secrets
+        if: ${{ inputs.service-name == 'auth-service' }}
+        run: |
+          kubectl create secret generic auth-service-secrets \
+            --from-literal=SMTP_HOST="${{ secrets.SMTP_HOST }}" \
+            --from-literal=SMTP_PORT="${{ secrets.SMTP_PORT }}" \
+            --from-literal=SMTP_SECURE="${{ secrets.SMTP_SECURE }}" \
+            --from-literal=SMTP_USER="${{ secrets.SMTP_USER }}" \
+            --from-literal=SMTP_PASS="${{ secrets.SMTP_PASS }}" \
+            --from-literal=EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            --from-literal=APP_BASE_URL="${{ secrets.APP_BASE_URL }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create/Update Gateway Secrets
+        if: ${{ inputs.service-name == 'gateway' }}
+        run: |
+          kubectl create secret generic gateway-secrets \
+            --from-literal=AUTH_SERVICE_URL="${{ secrets.AUTH_SERVICE_URL }}" \
+            --from-literal=GYM_SERVICE_URL="${{ secrets.GYM_SERVICE_URL }}" \
+            --from-literal=TRACKER_SERVICE_URL="${{ secrets.TRACKER_SERVICE_URL }}" \
+            --from-literal=WIZARD_SERVICE_URL="${{ secrets.WIZARD_SERVICE_URL }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create/Update Tracker Service Secrets
+        if: ${{ inputs.service-name == 'tracker-service' }}
+        run: |
+          kubectl create secret generic tracker-service-secrets \
+            --from-literal=GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create/Update Wizard Service Secrets
+        if: ${{ inputs.service-name == 'wizard-service' }}
+        run: |
+          kubectl create secret generic wizard-service-secrets \
+            --from-literal=SMTP_HOST="${{ secrets.SMTP_HOST }}" \
+            --from-literal=SMTP_PORT="${{ secrets.SMTP_PORT }}" \
+            --from-literal=SMTP_SECURE="${{ secrets.SMTP_SECURE }}" \
+            --from-literal=SMTP_USER="${{ secrets.SMTP_USER }}" \
+            --from-literal=SMTP_PASS="${{ secrets.SMTP_PASS }}" \
+            --from-literal=EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🚀 Run Prisma Migrations
+        if: inputs.run-migrations
+        run: |
+          echo "::group::Prisma Migration Logs"
+          POD_NAME="migration-${{ inputs.service-name }}-${{ github.run_id }}"
+          
+          # Create the migration pod
+          kubectl run $POD_NAME \
+            --image=${{ inputs.image-tag }} \
+            --restart=Never \
+            --namespace=${{ env.NAMESPACE }} \
+            --overrides='{"spec":{"imagePullSecrets":[{"name":"ghcr-credentials"}],"containers":[{"name":"migration","image":"${{ inputs.image-tag }}","command":["npx","prisma","migrate","deploy"],"envFrom":[{"secretRef":{"name":"fitnexa-common"}},{"secretRef":{"name":"${{ inputs.service-name }}-secrets"}}]}]}}'
+          
+          # Wait and Stream (Handle potential race condition where pod finishes before logs start)
+          kubectl wait --for=condition=Initialized pod/$POD_NAME -n ${{ env.NAMESPACE }} --timeout=60s
+          kubectl logs -f $POD_NAME -n ${{ env.NAMESPACE }}
+          
+          # Capture Exit Code
+          EXIT_CODE=$(kubectl get pod $POD_NAME -n ${{ env.NAMESPACE }} -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}')
+          kubectl delete pod $POD_NAME -n ${{ env.NAMESPACE }} --wait=false
+          
+          if [ "$EXIT_CODE" -ne "0" ]; then
+            echo "::error::Migration failed with exit code $EXIT_CODE"
+            exit 1
+          fi
+          echo "::endgroup::"
+
+      - name: ☸️ Helm Upgrade
+        run: |
+          echo "::group::Helm Upgrade Output"
+          # Extract tag safely: handles both 'service:tag' and 'registry/service:tag'
+          TAG="${{ inputs.image-tag }}"
+          TAG="${TAG##*:}"
+          
+          helm upgrade --install ${{ inputs.service-name }} \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-${{ inputs.service-name }} \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/${{ inputs.service-name }}.yaml \
+            --atomic \
+            --cleanup-on-fail \
+            --wait \
+            --timeout 300s
+          echo "::endgroup::"
+
+      - name: 🔍 Verify Rollout
+        run: |
+          kubectl rollout status deployment/${{ inputs.service-name }} \
+            --namespace ${{ env.NAMESPACE }} --timeout 60s
+
+      - name: 🚨 Debug on Failure
+        if: failure()
+        run: |
+          echo "::group::Diagnostic Dashboard"
+          LABEL="app.kubernetes.io/name=${{ inputs.service-name }}"
+          
+          echo "--- POD STATUS ---"
+          kubectl get pods -n ${{ env.NAMESPACE }} -l "$LABEL" -o wide
+          
+          echo "--- K8S EVENTS (LAST 15) ---"
+          kubectl get events -n ${{ env.NAMESPACE }} --sort-by='.lastTimestamp' | grep -i "${{ inputs.service-name }}" | tail -n 15
+          
+          echo "--- CONTAINER LOGS (STDOUT/STDERR) ---"
+          kubectl logs -n ${{ env.NAMESPACE }} -l "$LABEL" --all-containers --tail=100
+          
+          echo "--- PREVIOUS LOGS (IF CRASHED) ---"
+          kubectl logs -n ${{ env.NAMESPACE }} -l "$LABEL" --all-containers --tail=100 --previous 2>/dev/null || echo "No previous logs found."
+          echo "::endgroup::"

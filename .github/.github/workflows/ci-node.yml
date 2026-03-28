@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        type: string
+        default: '22'
+      test-command:
+        type: string
+        default: 'npm run test -- --coverage --passWithNoTests'
+      run-sonar:
+        type: boolean
+        default: false
+    secrets:
+      NPM_TOKEN:
+        required: true
+      SONAR_TOKEN:
+        required: false
+      SONAR_HOST_URL:
+        required: false
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ inputs.node-version }}
+          registry-url: https://npm.pkg.github.com
+          scope: '@gymia-fit'
+
+      - name: Resolve workspace:* references
+        run: sed -i 's|"workspace:\*"|"*"|g' package.json
+
+      - name: Install dependencies
+        run: npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: ${{ inputs.test-command }}
+
+      - name: SonarQube Scan
+        if: inputs.run-sonar
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

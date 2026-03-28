@@ -1,0 +1,67 @@
+name: Deploy UAT Backend
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        type: string
+        required: true
+        description: 'Docker Compose service name'
+      image-name:
+        type: string
+        required: true
+        description: 'GHCR image name'
+      health-port:
+        type: string
+        required: true
+        description: 'Service health check port'
+      run-migrations:
+        type: boolean
+        default: false
+        description: 'Run Prisma migrations before deploy'
+    secrets:
+      UAT_HOST:
+        required: true
+      UAT_SSH_KEY:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: uat
+    steps:
+      - name: Run Prisma migrations
+        if: inputs.run-migrations
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.UAT_HOST }}
+          username: fitnexa
+          key: ${{ secrets.UAT_SSH_KEY }}
+          script: |
+            docker run --rm --network fitnexa-net \
+              --env-file /opt/fitnexa/services/${{ inputs.service-name }}.env \
+              ghcr.io/gymia-fit/${{ inputs.image-name }}:uat-latest \
+              npx prisma db push --skip-generate --accept-data-loss
+
+      - name: Deploy service
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.UAT_HOST }}
+          username: fitnexa
+          key: ${{ secrets.UAT_SSH_KEY }}
+          script: |
+            cd /opt/fitnexa
+            docker compose pull ${{ inputs.service-name }}
+            docker compose up -d --no-deps ${{ inputs.service-name }}
+            docker image prune -f
+
+      - name: Health check
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.UAT_HOST }}
+          username: fitnexa
+          key: ${{ secrets.UAT_SSH_KEY }}
+          script: |
+            sleep 10
+            curl -sf http://localhost:${{ inputs.health-port }}/health || \
+              (docker compose -f /opt/fitnexa/docker-compose.yml logs --tail=50 ${{ inputs.service-name }} && exit 1)
