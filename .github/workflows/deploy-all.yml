@@ -1,0 +1,340 @@
+name: Deploy All Services
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: prod-${{ github.repository }}
+  cancel-in-progress: false
+
+env:
+  NAMESPACE: fitnexa
+  REGISTRY: ghcr.io/gymia-fit
+
+jobs:
+  # ===========================================
+  # CI - Run tests and linting
+  # ===========================================
+  ci:
+    uses: gymia-fit/.github/.github/workflows/ci-node.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # ===========================================
+  # BUILD - All services
+  # ===========================================
+  build-landing:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-business-landing
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-auth:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-auth-service
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-gateway:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-gateway
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-gym-service:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-gym-service
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-tracker-service:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-tracker-service
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-wizard-service:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-wizard-service
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-onboarding:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-onboarding
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-gym-admin:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-gym-admin
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-super-admin:
+    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+    with:
+      image-name: fitnexa-super-admin
+      tag-prefix: 'prod-'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # ===========================================
+  # DEPLOY - All services with secrets
+  # ===========================================
+  deploy:
+    needs: [
+      build-landing, build-auth, build-gateway,
+      build-gym-service, build-tracker-service, build-wizard-service,
+      build-onboarding, build-gym-admin, build-super-admin
+    ]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: 📥 Checkout Infra
+        uses: actions/checkout@v5
+        with:
+          repository: gymia-fit/fitnexa-infra
+          token: ${{ secrets.INFRA_TOKEN }}
+          path: infra
+
+      - name: 🛠️ Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: 🔑 Configure Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl cluster-info
+
+      - name: 🔐 Create/Update Common Secrets
+        run: |
+          echo "Creating fitnexa-common secret..."
+          kubectl create secret generic fitnexa-common \
+            --from-literal=REDIS_URL="${{ secrets.REDIS_URL }}" \
+            --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --from-literal=SERVICE_SECRET="${{ secrets.SERVICE_SECRET }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create Database Secrets
+        run: |
+          # Auth service
+          kubectl create secret generic auth-service-db \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL_AUTH }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Gym service
+          kubectl create secret generic gym-service-db \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL_GYM }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Tracker service
+          kubectl create secret generic tracker-service-db \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL_TRACKER }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Wizard service
+          kubectl create secret generic wizard-service-db \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL_WIZARD }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create Auth Service Secrets
+        run: |
+          kubectl create secret generic auth-service-secrets \
+            --from-literal=SMTP_HOST="${{ secrets.SMTP_HOST }}" \
+            --from-literal=SMTP_PORT="${{ secrets.SMTP_PORT }}" \
+            --from-literal=SMTP_SECURE="${{ secrets.SMTP_SECURE }}" \
+            --from-literal=SMTP_USER="${{ secrets.SMTP_USER }}" \
+            --from-literal=SMTP_PASS="${{ secrets.SMTP_PASS }}" \
+            --from-literal=EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            --from-literal=APP_BASE_URL="${{ secrets.APP_BASE_URL }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create Gateway Secrets
+        run: |
+          kubectl create secret generic gateway-secrets \
+            --from-literal=AUTH_SERVICE_URL="${{ secrets.AUTH_SERVICE_URL }}" \
+            --from-literal=GYM_SERVICE_URL="${{ secrets.GYM_SERVICE_URL }}" \
+            --from-literal=TRACKER_SERVICE_URL="${{ secrets.TRACKER_SERVICE_URL }}" \
+            --from-literal=WIZARD_SERVICE_URL="${{ secrets.WIZARD_SERVICE_URL }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create Wizard Service Secrets
+        run: |
+          kubectl create secret generic wizard-service-secrets \
+            --from-literal=SMTP_HOST="${{ secrets.SMTP_HOST }}" \
+            --from-literal=SMTP_PORT="${{ secrets.SMTP_PORT }}" \
+            --from-literal=SMTP_SECURE="${{ secrets.SMTP_SECURE }}" \
+            --from-literal=SMTP_USER="${{ secrets.SMTP_USER }}" \
+            --from-literal=SMTP_PASS="${{ secrets.SMTP_PASS }}" \
+            --from-literal=EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: 🔐 Create Tracker Service Secrets
+        run: |
+          kubectl create secret generic tracker-service-secrets \
+            --from-literal=GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
+            --namespace=${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: ✅ Verify Secrets
+        run: |
+          echo "=== Verifying secrets ==="
+          kubectl get secrets -n ${{ env.NAMESPACE }} | grep -E "fitnexa-common|auth-service|gym-service|tracker-service|wizard-service|gateway" || true
+
+      - name: ☸️ Deploy Landing
+        run: |
+          TAG="${{ needs.build-landing.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install landing \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-landing \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/landing.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Auth Service
+        run: |
+          TAG="${{ needs.build-auth.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install auth-service \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-auth-service \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/auth-service.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Gateway
+        run: |
+          TAG="${{ needs.build-gateway.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install gateway \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-gateway \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/gateway.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Gym Service
+        run: |
+          TAG="${{ needs.build-gym-service.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install gym-service \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-gym-service \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/gym-service.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Tracker Service
+        run: |
+          TAG="${{ needs.build-tracker-service.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install tracker-service \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-tracker-service \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/tracker-service.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Wizard Service
+        run: |
+          TAG="${{ needs.build-wizard-service.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install wizard-service \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-wizard-service \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/wizard-service.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Onboarding
+        run: |
+          TAG="${{ needs.build-onboarding.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install onboarding \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-onboarding \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/onboarding.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Gym Admin
+        run: |
+          TAG="${{ needs.build-gym-admin.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install gym-admin \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-gym-admin \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/gym-admin.yaml \
+            --wait --timeout 120s
+
+      - name: ☸️ Deploy Super Admin
+        run: |
+          TAG="${{ needs.build-super-admin.outputs.image-tag }}"
+          TAG="${TAG##*:}"
+          helm upgrade --install super-admin \
+            ./infra/helm/fitnexa-service \
+            --namespace ${{ env.NAMESPACE }} \
+            --set image.repository=${{ env.REGISTRY }}/fitnexa-super-admin \
+            --set image.tag=$TAG \
+            -f ./infra/helm/values/super-admin.yaml \
+            --wait --timeout 120s
+
+      - name: 🚨 Debug on Failure
+        if: failure()
+        run: |
+          echo "=== POD STATUS ==="
+          kubectl get pods -n ${{ env.NAMESPACE }} -o wide
+          
+          echo "=== DEPLOYMENT STATUS ==="
+          kubectl get deployments -n ${{ env.NAMESPACE }}
+          
+          echo "=== RECENT EVENTS ==="
+          kubectl get events -n ${{ env.NAMESPACE }} --sort-by='.lastTimestamp' | tail -30 || true
+          
+          echo "=== AUTH SERVICE LOGS ==="
+          kubectl logs -l app=auth-service -n ${{ env.NAMESPACE }} --tail=100 || true
+          
+          echo "=== GYM SERVICE LOGS ==="
+          kubectl logs -l app=gym-service -n ${{ env.NAMESPACE }} --tail=100 || true
