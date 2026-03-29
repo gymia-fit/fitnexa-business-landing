@@ -44,6 +44,9 @@ jobs:
   build:
     needs: [ci]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image-tag: ${{ steps.tags.outputs.sha-tag }}
     steps:
@@ -60,8 +63,8 @@ jobs:
       - name: Generate image tags
         id: tags
         run: |
-          SHA_TAG="ghcr.io/gymia-fit/fitnexa-business-landing:prod-${{ github.sha }}"
-          LATEST_TAG="ghcr.io/gymia-fit/fitnexa-business-landing:prod-latest"
+          SHA_TAG="ghcr.io/gymia-fit/fitnexa-landing:prod-${{ github.sha }}"
+          LATEST_TAG="ghcr.io/gymia-fit/fitnexa-landing:prod-latest"
           echo "sha-tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
           echo "latest-tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
@@ -105,7 +108,7 @@ jobs:
           helm upgrade --install business-landing \
             ./infra/helm/fitnexa-service \
             --namespace fitnexa \
-            --set image.repository=ghcr.io/gymia-fit/fitnexa-business-landing \
+            --set image.repository=ghcr.io/gymia-fit/fitnexa-landing \
             --set image.tag=$TAG \
             -f ./infra/helm/values/business-landing.yaml \
             --atomic --cleanup-on-fail --wait --timeout 120s
