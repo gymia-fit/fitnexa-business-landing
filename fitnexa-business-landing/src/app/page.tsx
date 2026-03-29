@@ -1,7 +1,9 @@
 import { BlogSection } from '@/components/sections/BlogSection';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { TrustLogosSection } from '@/components/sections/TrustLogosSection';
+import { CustomAppTrapSection } from '@/components/sections/CustomAppTrapSection';
 import { BrandShowcaseSection } from '@/components/sections/BrandShowcaseSection';
+import { AppComparisonSection } from '@/components/sections/AppComparisonSection';
 import { HowItWorksSection } from '@/components/sections/HowItWorksSection';
 import { AIDemoSection } from '@/components/sections/AIDemoSection';
 import { BenefitsSection } from '@/components/sections/BenefitsSection';
@@ -21,8 +23,14 @@ export default function BusinessPage(): React.JSX.Element {
       {/* Trust Logos - Social Proof */}
       <TrustLogosSection />
 
+      {/* Pain of Custom App Development */}
+      <CustomAppTrapSection />
+
       {/* Brand Showcase - Custom App Demo */}
       <BrandShowcaseSection />
+
+      {/* App Comparison - Generic vs Gymia */}
+      <AppComparisonSection />
 
       {/* How It Works - 4 Steps */}
       <HowItWorksSection />
