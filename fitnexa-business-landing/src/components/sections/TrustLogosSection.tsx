@@ -24,7 +24,7 @@ export function TrustLogosSection(): React.JSX.Element {
           className="text-center mb-10"
         >
           <p className="text-white/40 text-sm font-medium uppercase tracking-wider">
-            Trusted by 50+ Partner Gyms
+            Available at 50+ gyms near you
           </p>
         </motion.div>
 
@@ -57,7 +57,7 @@ export function TrustLogosSection(): React.JSX.Element {
           className="text-center mt-10"
         >
           <p className="text-white/30 text-sm">
-            And 40+ more gyms growing with Gymia
+            And 40+ more gyms — with new ones joining every week
           </p>
         </motion.div>
       </div>

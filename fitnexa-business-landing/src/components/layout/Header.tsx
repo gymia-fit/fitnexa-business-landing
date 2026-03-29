@@ -9,9 +9,9 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { label: 'Features', href: '#features' },
-  { label: 'Benefits', href: '#benefits' },
+  { label: 'How it works', href: '#how-it-works' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'Testimonials', href: '#testimonials' },
+  { label: 'Blog', href: '/blog' },
   { label: 'FAQ', href: '#faq' },
 ];
 
@@ -46,10 +46,10 @@ export function Header(): React.JSX.Element {
 
         <div className="flex items-center gap-3">
           <Link
-            href="https://app.gymia.fit/gym-signup"
-            className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-colors hover:bg-white/90"
+            href="https://app.gymia.fit/register"
+            className="inline-flex items-center justify-center rounded-full bg-brand-500 px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-brand-400 hover:scale-105"
           >
-            Get Started
+            Join Free
           </Link>
         </div>
       </Container>

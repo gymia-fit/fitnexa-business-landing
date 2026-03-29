@@ -1,44 +1,43 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Target, Users, TrendingUp, Heart, DollarSign, ArrowRight, Building2, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { CalendarCheck, BrainCircuit, TrendingUp, Users, Salad, Bell } from 'lucide-react';
 
-const businessBenefits = [
+const benefits = [
   {
-    icon: Target,
-    title: 'Lead Generation',
-    description: 'See exactly where demand is growing in your area. Gymia shows you interested users before they even become members.',
+    icon: CalendarCheck,
+    title: 'Book Classes Instantly',
+    description: 'Browse today\'s schedule and reserve your spot in 2 taps. Get a reminder 30 minutes before so you never show up late.',
     gradient: 'from-brand-500 to-brand-400',
   },
   {
-    icon: Users,
-    title: 'Member Activation',
-    description: 'Turn free users into active gym members. Digital engagement creates more touchpoints for conversion.',
+    icon: BrainCircuit,
+    title: 'AI Workout Plans',
+    description: 'Tell us your goal. Get a personalized plan that evolves week by week as you get stronger — no PT required.',
     gradient: 'from-brand-600 to-brand-500',
   },
   {
     icon: TrendingUp,
-    title: 'Higher Conversion',
-    description: 'Users who engage with the virtual gym are warmer leads. Show them the value of your physical location.',
+    title: 'Track Every PR',
+    description: 'Log sets, reps, and weights. Watch your strength curve climb over time and know exactly when you\'re ready to push more.',
     gradient: 'from-brand-500 to-brand-400',
   },
   {
-    icon: Heart,
-    title: 'Better Retention',
-    description: 'Digital touchpoints keep members engaged between visits. Build a stronger community that keeps coming back.',
+    icon: Users,
+    title: 'Your Gym Community',
+    description: 'See who\'s in your next class, celebrate each other\'s milestones, and build friendships that actually get you out of bed at 6am.',
     gradient: 'from-brand-600 to-brand-500',
   },
   {
-    icon: DollarSign,
-    title: 'New Revenue Streams',
-    description: 'Sell products, supplements, and apparel through the app. Offer premium programs and memberships.',
+    icon: Salad,
+    title: 'Nutrition That Fits',
+    description: 'Log meals, track macros, and stay fuelled for every session. Simple enough to actually stick with.',
     gradient: 'from-brand-500 to-brand-400',
   },
   {
-    icon: Building2,
-    title: 'White-Label Platform',
-    description: 'Get a custom-branded app without the custom development cost. Your members get an experience that\'s uniquely yours.',
+    icon: Bell,
+    title: 'Never Miss a Thing',
+    description: 'Class reminders, coach announcements, schedule changes — everything from your gym lands in one place, instantly.',
     gradient: 'from-brand-600 to-brand-500',
   },
 ];
@@ -59,15 +58,16 @@ export function BenefitsSection(): React.JSX.Element {
             viewport={{ once: true }}
             className="inline-block px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-medium mb-6"
           >
-            For Gyms
+            What You Get
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6"
+            className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6 leading-tight"
           >
-            Grow Your Gym with <span className="text-brand-400">Real Demand</span>
+            Everything you need to{' '}
+            <span className="text-brand-400">actually show up.</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -75,14 +75,13 @@ export function BenefitsSection(): React.JSX.Element {
             viewport={{ once: true }}
             className="text-xl text-white/50 max-w-2xl mx-auto"
           >
-            Gymia isn't just another gym software. It's a growth engine that captures demand, 
-            converts leads, and keeps members engaged — all through a branded digital experience.
+            Gymia removes every excuse. Book, track, eat, connect — one app, zero friction.
           </motion.p>
         </div>
 
         {/* Benefits Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {businessBenefits.map((benefit, i) => {
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+          {benefits.map((benefit, i) => {
             const Icon = benefit.icon;
             return (
               <motion.div
@@ -90,10 +89,10 @@ export function BenefitsSection(): React.JSX.Element {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.08 }}
                 className="group relative rounded-3xl bg-white/5 border border-white/10 p-8 hover:border-white/20 transition-all"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
                   <Icon className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{benefit.title}</h3>
@@ -103,55 +102,24 @@ export function BenefitsSection(): React.JSX.Element {
           })}
         </div>
 
-        {/* Stats / Social Proof */}
+        {/* Stats bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-6"
         >
           {[
-            { value: '10K+', label: 'Active Users' },
-            { value: '50+', label: 'Partner Gyms' },
-            { value: '85%', label: 'Engagement Rate' },
-            { value: '3x', label: 'Lead Increase' },
-          ].map((stat, i) => (
+            { value: '10K+', label: 'Active Members' },
+            { value: '4.9★', label: 'App Store Rating' },
+            { value: '85%', label: 'Weekly Retention' },
+            { value: '2 taps', label: 'To Book a Class' },
+          ].map((stat) => (
             <div key={stat.label} className="text-center p-6 rounded-2xl bg-white/5 border border-white/10">
               <p className="text-3xl md:text-4xl font-black text-white mb-2">{stat.value}</p>
               <p className="text-white/50 text-sm">{stat.label}</p>
             </div>
           ))}
-        </motion.div>
-
-        {/* CTA for Gyms */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
-            <Sparkles className="w-4 h-4 text-brand-400" />
-            <span className="text-sm font-medium text-white/80">Start Your Digital Transformation</span>
-          </div>
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-6">
-            Ready to capture demand and grow your gym?
-          </h3>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="https://app.gymia.fit/gym-signup"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-brand-500 text-white font-bold text-lg rounded-full hover:bg-brand-400 transition-all hover:scale-105"
-            >
-              Bring Gymia to Your Gym
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="#demo"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 text-white font-bold text-lg rounded-full hover:bg-white/10 backdrop-blur-sm transition-all"
-            >
-              Request a Demo
-            </Link>
-          </div>
         </motion.div>
       </div>
     </section>

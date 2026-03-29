@@ -6,36 +6,36 @@ import { useState } from 'react';
 
 const faqs = [
   {
-    question: "How does the 2-month free trial work?",
-    answer: "You get full access to all features for 2 months completely free. No credit card required. After the trial, you can choose to continue with a paid plan or cancel anytime.",
+    question: 'Is Gymia really free for members?',
+    answer: 'Yes — completely free if your gym is a Gymia partner. Your gym covers the cost. No hidden fees, no credit card, no expiry. The free Member plan is yours for as long as you train there.',
   },
   {
-    question: "What happens to my data if I cancel?",
-    answer: "Your data is always yours. If you cancel, we'll send you all your data in a portable format. We never hold your data hostage.",
+    question: 'My gym isn\'t on Gymia yet. What do I do?',
+    answer: 'Tell your gym owner about us! Share our link with them or drop your gym\'s email in the chat — our team will reach out and get them set up within days. In the meantime, the Solo plan lets you use the workout logger and AI plans independently.',
   },
   {
-    question: "How long does setup take?",
-    answer: "Most gyms are up and running within 2-3 days. Our team helps you with the initial setup, and the platform is designed to be intuitive and easy to use.",
+    question: 'Can I actually book classes through the app?',
+    answer: 'Yes. Browse the full class schedule, filter by time or coach, and book your spot in seconds. You\'ll get a push notification 30 minutes before class. Cancel up to 1 hour before — all from the app, no calls needed.',
   },
   {
-    question: "Do I need technical skills to use Gymia?",
-    answer: "Not at all. Gymia is designed for gym owners, not developers. If you can use a smartphone, you can use Gymia.",
+    question: 'What does the AI workout planner actually do?',
+    answer: 'You tell it your goal (fat loss, muscle gain, strength, endurance), your current fitness level, and how many days a week you can train. It builds a custom program and updates it automatically as you log workouts and progress. It\'s like a PT that\'s always available and always watching your data.',
   },
   {
-    question: "Can I customize the app with my gym's branding?",
-    answer: "Yes! Our Growth and Enterprise plans include full white-label customization. Your logo, your colors, your app.",
+    question: 'Does Gymia work for all gym types?',
+    answer: 'Yes — CrossFit boxes, yoga studios, traditional gyms, HIIT facilities, boxing gyms, Pilates. If your gym has classes or a floor, Gymia works for it.',
   },
   {
-    question: "What kind of support do you offer?",
-    answer: "We offer email support for all plans, priority support for Growth plans, and dedicated support for Enterprise plans. Our team is always here to help.",
+    question: 'Can I use Gymia if my gym doesn\'t offer group classes?',
+    answer: 'Absolutely. The AI workout planner, workout logger, progress tracker, streak system, and nutrition tracker all work fully independently of class booking. The Solo plan is perfect for this.',
   },
   {
-    question: "How much does a custom gym app usually cost?",
-    answer: "A custom gym app typically costs $30,000–$80,000+ to build — and that's before launch. Add 6–12 months of development time, App Store review cycles, and $1,000–$3,000/month in ongoing maintenance just to keep it running on the latest iOS and Android versions. Most gyms that go down this road end up with a generic-looking product that's already outdated by the time it ships. Gymia gives you a fully branded app at a fraction of that cost, live in days.",
+    question: 'What happens to my data if I leave my gym?',
+    answer: 'Your workout history, progress photos, PRs, and nutrition logs are yours — always. If you switch gyms, your data comes with you. If you close your account, we export everything to you in a standard format. We never hold your data hostage.',
   },
   {
-    question: "Why not just hire a developer to build my app?",
-    answer: "You can — but consider what you're signing up for. Good mobile developers are expensive and hard to find. Agencies routinely overpromise and underdeliver. Once the app is built, you own all the maintenance: OS updates break things, security patches need applying, App Store policies change. That's a part-time job on top of running your gym. With Gymia, our team handles 100% of the infrastructure, updates, and App Store management. You focus on your members; we handle the tech.",
+    question: 'How is this different from apps like MyFitnessPal or Strava?',
+    answer: 'Those are great generic apps. Gymia is different because it\'s connected to your actual gym — your real schedule, your real coaches, your real community. You can book a class, log the workout your coach just ran, message your coach, and see which of your gym friends are in tonight\'s session. No other app does that.',
   },
 ];
 
@@ -63,9 +63,10 @@ export function FAQSection(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6"
+            className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6 leading-tight"
           >
-            Frequently Asked <span className="text-brand-400">Questions</span>
+            Questions we{' '}
+            <span className="text-brand-400">actually get asked.</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -73,11 +74,10 @@ export function FAQSection(): React.JSX.Element {
             viewport={{ once: true }}
             className="text-xl text-white/50 max-w-2xl mx-auto"
           >
-            Got questions? We've got answers.
+            No fluff. Just straight answers.
           </motion.p>
         </div>
 
-        {/* FAQ Grid */}
         <div className="max-w-3xl mx-auto">
           {faqs.map((faq, i) => (
             <motion.div
@@ -85,23 +85,23 @@ export function FAQSection(): React.JSX.Element {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.07 }}
               className="mb-4"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="w-full flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all text-left"
               >
-                <span className="text-lg font-bold text-white">{faq.question}</span>
+                <span className="text-lg font-bold text-white pr-4">{faq.question}</span>
                 <ChevronDown
-                  className={`w-6 h-6 text-white/50 transition-transform ${
+                  className={`w-6 h-6 text-white/50 shrink-0 transition-transform ${
                     openIndex === i ? 'rotate-180' : ''
                   }`}
                 />
               </button>
               {openIndex === i && (
-                <div className="px-6 pb-6">
-                  <p className="text-white/50 leading-relaxed">{faq.answer}</p>
+                <div className="px-6 pb-6 pt-2">
+                  <p className="text-white/60 leading-relaxed">{faq.answer}</p>
                 </div>
               )}
             </motion.div>

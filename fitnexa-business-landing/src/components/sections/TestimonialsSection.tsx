@@ -1,33 +1,29 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Star, Quote, TrendingUp, Users, DollarSign } from 'lucide-react';
-import Image from 'next/image';
+import { Star, Quote, Flame, TrendingUp, CalendarCheck } from 'lucide-react';
 
 const testimonials = [
   {
-    quote: "Gymia transformed our gym operations. We've seen a 40% increase in member retention and 3x more leads since implementing the platform.",
-    author: "Sarah Johnson",
-    role: "Owner, FitLife Gym",
+    quote: "I used to forget my gym existed for weeks at a time. Now I check Gymia every morning to book my class. Haven't missed a week in four months.",
+    author: "Jake M.",
+    role: "PowerHouse Fitness · Member",
     rating: 5,
-    metric: { value: '40%', label: 'Retention Increase', icon: TrendingUp },
-    image: '/images/testimonials/sarah-johnson.jpg',
+    metric: { value: '4 months', label: 'Unbroken Streak', icon: Flame },
   },
   {
-    quote: "The analytics dashboard alone is worth the investment. We converted 150 free users to paid members in the first 3 months.",
-    author: "Michael Chen",
-    role: "Manager, PowerHouse Fitness",
+    quote: "The AI workout plans actually adapt. I went from barely squatting bodyweight to 90kg in six months. No trainer, just me and the app.",
+    author: "Sofia K.",
+    role: "Elite Training Center · Member",
     rating: 5,
-    metric: { value: '150+', label: 'New Members', icon: Users },
-    image: '/images/testimonials/michael-chen.jpg',
+    metric: { value: '90kg', label: 'Squat PR', icon: TrendingUp },
   },
   {
-    quote: "Our members love the mobile app. Class bookings increased 65% and we've added $12K/month in-app product sales.",
-    author: "Emily Rodriguez",
-    role: "Director, Elite Training Center",
+    quote: "My gym used to send class slots through a WhatsApp group. This is a completely different world. I booked my first class in under 30 seconds.",
+    author: "Marcus T.",
+    role: "FitLife Gym · Member",
     rating: 5,
-    metric: { value: '$12K', label: 'Monthly Revenue', icon: DollarSign },
-    image: '/images/testimonials/emily-rodriguez.jpg',
+    metric: { value: '30 sec', label: 'To Book a Class', icon: CalendarCheck },
   },
 ];
 
@@ -47,15 +43,16 @@ export function TestimonialsSection(): React.JSX.Element {
             viewport={{ once: true }}
             className="inline-block px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-medium mb-6"
           >
-            Testimonials
+            Member Stories
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6"
+            className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6 leading-tight"
           >
-            Loved by <span className="text-brand-400">50+ Gym Owners</span>
+            Real members.{' '}
+            <span className="text-brand-400">Real results.</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -63,11 +60,10 @@ export function TestimonialsSection(): React.JSX.Element {
             viewport={{ once: true }}
             className="text-xl text-white/50 max-w-2xl mx-auto"
           >
-            Join the growing community of gym owners who are already growing with Gymia.
+            10,000+ people already training harder because their gym is finally on their phone.
           </motion.p>
         </div>
 
-        {/* Testimonials Grid */}
         <div className="grid md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, i) => {
             const MetricIcon = testimonial.metric.icon;
@@ -84,10 +80,10 @@ export function TestimonialsSection(): React.JSX.Element {
                 <p className="text-white/80 text-lg mb-6 leading-relaxed">
                   &ldquo;{testimonial.quote}&rdquo;
                 </p>
-                
-                {/* Metric Highlight */}
+
+                {/* Metric */}
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center shrink-0">
                     <MetricIcon className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -103,10 +99,10 @@ export function TestimonialsSection(): React.JSX.Element {
                   ))}
                 </div>
 
-                {/* Author with Image */}
+                {/* Author */}
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center text-white font-bold text-sm">
-                    {testimonial.author.split(' ').map(n => n[0]).join('')}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    {testimonial.author.split(' ').map((n) => n[0]).join('')}
                   </div>
                   <div>
                     <p className="text-white font-bold">{testimonial.author}</p>
@@ -118,16 +114,15 @@ export function TestimonialsSection(): React.JSX.Element {
           })}
         </div>
 
-        {/* Additional Social Proof */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <p className="text-white/40 text-sm mb-4">And 50+ more gym owners trust Gymia</p>
+          <p className="text-white/40 text-sm mb-4">Members training at these gyms and more</p>
           <div className="flex flex-wrap justify-center gap-3">
-            {['FitLife Gym', 'PowerHouse Fitness', 'Elite Training', 'Iron Paradise', 'Apex Athletics'].map((gym, i) => (
+            {['FitLife Gym', 'PowerHouse Fitness', 'Elite Training', 'Iron Paradise', 'Apex Athletics'].map((gym) => (
               <span
                 key={gym}
                 className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/40 text-sm"

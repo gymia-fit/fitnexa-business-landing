@@ -1,65 +1,45 @@
-import { BlogSection } from '@/components/sections/BlogSection';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { TrustLogosSection } from '@/components/sections/TrustLogosSection';
-import { CustomAppTrapSection } from '@/components/sections/CustomAppTrapSection';
-import { BrandShowcaseSection } from '@/components/sections/BrandShowcaseSection';
-import { AppComparisonSection } from '@/components/sections/AppComparisonSection';
-import { HowItWorksSection } from '@/components/sections/HowItWorksSection';
-import { AIDemoSection } from '@/components/sections/AIDemoSection';
 import { BenefitsSection } from '@/components/sections/BenefitsSection';
 import { FeaturesSection } from '@/components/sections/FeaturesSection';
-import { PricingSection } from '@/components/sections/PricingSection';
-import { TrustBadgesSection } from '@/components/sections/TrustBadgesSection';
+import { HowItWorksSection } from '@/components/sections/HowItWorksSection';
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
+import { BlogSection } from '@/components/sections/BlogSection';
+import { PricingSection } from '@/components/sections/PricingSection';
 import { FAQSection } from '@/components/sections/FAQSection';
 import { CTASection } from '@/components/sections/CTASection';
 
 export default function BusinessPage(): React.JSX.Element {
   return (
     <>
-      {/* Hero Section */}
+      {/* Hook — what is Gymia and who is it for */}
       <HeroSection />
 
-      {/* Trust Logos - Social Proof */}
+      {/* Social proof — gyms already using it */}
       <TrustLogosSection />
 
-      {/* Pain of Custom App Development */}
-      <CustomAppTrapSection />
-
-      {/* Brand Showcase - Custom App Demo */}
-      <BrandShowcaseSection />
-
-      {/* App Comparison - Generic vs Gymia */}
-      <AppComparisonSection />
-
-      {/* How It Works - 4 Steps */}
-      <HowItWorksSection />
-
-      {/* AI Demo Section - Interactive */}
-      <AIDemoSection />
-
-      {/* Benefits Section */}
+      {/* Benefits — outcomes for the member */}
       <BenefitsSection />
 
-      {/* Features Section */}
+      {/* Features — what the app actually does */}
       <FeaturesSection />
 
-      {/* Pricing Section */}
-      <PricingSection />
+      {/* How it works — frictionless onboarding */}
+      <HowItWorksSection />
 
-      {/* Trust Badges - Security & Compliance */}
-      <TrustBadgesSection />
-
-      {/* Testimonials Section */}
+      {/* Testimonials — real member stories */}
       <TestimonialsSection />
 
-      {/* Blog Section */}
+      {/* Pricing — free anchor + upsell */}
+      <PricingSection />
+
+      {/* Blog — builds trust + SEO */}
       <BlogSection />
 
-      {/* FAQ Section */}
+      {/* FAQ — handles remaining objections */}
       <FAQSection />
 
-      {/* CTA Section */}
+      {/* Final CTA */}
       <CTASection />
     </>
   );
