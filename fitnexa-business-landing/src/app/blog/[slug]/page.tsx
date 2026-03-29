@@ -2,8 +2,6 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
 import Link from 'next/link';
 import { blogPosts, getPostBySlug, getAllSlugs } from '@/assets/blogPosts';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -22,10 +20,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-black">
-        <article className="py-20">
+    <main className="min-h-screen bg-black">
+      <article className="py-20">
           <div className="container mx-auto px-6 max-w-4xl">
             {/* Back Link */}
             <Link
@@ -115,8 +111,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           </div>
         </article>
-      </main>
-      <Footer />
-    </>
+    </main>
   );
 }
