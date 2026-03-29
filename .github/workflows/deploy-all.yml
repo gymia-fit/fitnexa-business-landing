@@ -23,17 +23,20 @@ jobs:
   # ===========================================
   ci:
     uses: gymia-fit/.github/.github/workflows/ci-node.yml@main
+    with:
+      working-directory: fitnexa-business-landing
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # ===========================================
-  # BUILD - All services
+  # BUILD - All services (context = service subdirectory)
   # ===========================================
   build-landing:
     uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
     with:
       image-name: fitnexa-business-landing
       tag-prefix: 'prod-'
+      context: fitnexa-business-landing
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -42,6 +45,7 @@ jobs:
     with:
       image-name: fitnexa-auth-service
       tag-prefix: 'prod-'
+      context: fitnexa-auth-service
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -50,6 +54,7 @@ jobs:
     with:
       image-name: fitnexa-gateway
       tag-prefix: 'prod-'
+      context: fitnexa-gateway
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -58,6 +63,7 @@ jobs:
     with:
       image-name: fitnexa-gym-service
       tag-prefix: 'prod-'
+      context: fitnexa-gym-service
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -66,6 +72,7 @@ jobs:
     with:
       image-name: fitnexa-tracker-service
       tag-prefix: 'prod-'
+      context: fitnexa-tracker-service
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -74,6 +81,7 @@ jobs:
     with:
       image-name: fitnexa-wizard-service
       tag-prefix: 'prod-'
+      context: fitnexa-wizard-service
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -82,6 +90,7 @@ jobs:
     with:
       image-name: fitnexa-onboarding
       tag-prefix: 'prod-'
+      context: fitnexa-onboarding
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -90,6 +99,7 @@ jobs:
     with:
       image-name: fitnexa-gym-admin
       tag-prefix: 'prod-'
+      context: fitnexa-gym-admin
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -98,6 +108,7 @@ jobs:
     with:
       image-name: fitnexa-super-admin
       tag-prefix: 'prod-'
+      context: fitnexa-super-admin
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 

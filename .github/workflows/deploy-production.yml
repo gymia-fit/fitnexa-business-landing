@@ -15,153 +15,27 @@ concurrency:
 jobs:
   ci:
     uses: gymia-fit/.github/.github/workflows/ci-node.yml@main
+    with:
+      working-directory: fitnexa-business-landing
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  build-landing:
+  build:
+    needs: [ci]
     uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
     with:
       image-name: fitnexa-business-landing
       tag-prefix: 'prod-'
+      context: fitnexa-business-landing
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  build-auth:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
+  deploy:
+    needs: [build]
+    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
     with:
-      image-name: fitnexa-auth-service
-      tag-prefix: 'prod-'
+      service-name: business-landing
+      image-tag: ${{ needs.build.outputs.image-tag }}
     secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-gateway:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
-    with:
-      image-name: fitnexa-gateway
-      tag-prefix: 'prod-'
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-gym-service:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
-    with:
-      image-name: fitnexa-gym-service
-      tag-prefix: 'prod-'
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-tracker-service:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
-    with:
-      image-name: fitnexa-tracker-service
-      tag-prefix: 'prod-'
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-wizard-service:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
-    with:
-      image-name: fitnexa-wizard-service
-      tag-prefix: 'prod-'
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-onboarding:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
-    with:
-      image-name: fitnexa-onboarding
-      tag-prefix: 'prod-'
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-gym-admin:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
-    with:
-      image-name: fitnexa-gym-admin
-      tag-prefix: 'prod-'
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-super-admin:
-    uses: gymia-fit/.github/.github/workflows/build-docker.yml@main
-    with:
-      image-name: fitnexa-super-admin
-      tag-prefix: 'prod-'
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  deploy-landing:
-    needs: [build-landing]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: landing
-      image-tag: ${{ needs.build-landing.outputs.image-tag }}
-    secrets: inherit
-
-  deploy-auth:
-    needs: [build-auth]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: auth-service
-      image-tag: ${{ needs.build-auth.outputs.image-tag }}
-      run-migrations: true
-    secrets: inherit
-
-  deploy-gateway:
-    needs: [build-gateway]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: gateway
-      image-tag: ${{ needs.build-gateway.outputs.image-tag }}
-    secrets: inherit
-
-  deploy-gym-service:
-    needs: [build-gym-service]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: gym-service
-      image-tag: ${{ needs.build-gym-service.outputs.image-tag }}
-      run-migrations: true
-    secrets: inherit
-
-  deploy-tracker-service:
-    needs: [build-tracker-service]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: tracker-service
-      image-tag: ${{ needs.build-tracker-service.outputs.image-tag }}
-      run-migrations: true
-    secrets: inherit
-
-  deploy-wizard-service:
-    needs: [build-wizard-service]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: wizard-service
-      image-tag: ${{ needs.build-wizard-service.outputs.image-tag }}
-      run-migrations: true
-    secrets: inherit
-
-  deploy-onboarding:
-    needs: [build-onboarding]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: onboarding
-      image-tag: ${{ needs.build-onboarding.outputs.image-tag }}
-    secrets: inherit
-
-  deploy-gym-admin:
-    needs: [build-gym-admin]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: gym-admin
-      image-tag: ${{ needs.build-gym-admin.outputs.image-tag }}
-    secrets: inherit
-
-  deploy-super-admin:
-    needs: [build-super-admin]
-    uses: gymia-fit/.github/.github/workflows/deploy-k3s.yml@main
-    with:
-      service-name: super-admin
-      image-tag: ${{ needs.build-super-admin.outputs.image-tag }}
-    secrets: inherit
+      KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
