@@ -29,6 +29,14 @@ const faqs = [
     question: "What kind of support do you offer?",
     answer: "We offer email support for all plans, priority support for Growth plans, and dedicated support for Enterprise plans. Our team is always here to help.",
   },
+  {
+    question: "How much does a custom gym app usually cost?",
+    answer: "A custom gym app typically costs $30,000–$80,000+ to build — and that's before launch. Add 6–12 months of development time, App Store review cycles, and $1,000–$3,000/month in ongoing maintenance just to keep it running on the latest iOS and Android versions. Most gyms that go down this road end up with a generic-looking product that's already outdated by the time it ships. Gymia gives you a fully branded app at a fraction of that cost, live in days.",
+  },
+  {
+    question: "Why not just hire a developer to build my app?",
+    answer: "You can — but consider what you're signing up for. Good mobile developers are expensive and hard to find. Agencies routinely overpromise and underdeliver. Once the app is built, you own all the maintenance: OS updates break things, security patches need applying, App Store policies change. That's a part-time job on top of running your gym. With Gymia, our team handles 100% of the infrastructure, updates, and App Store management. You focus on your members; we handle the tech.",
+  },
 ];
 
 export function FAQSection(): React.JSX.Element {

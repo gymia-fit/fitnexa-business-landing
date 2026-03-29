@@ -62,8 +62,8 @@ export function HeroSection(): React.JSX.Element {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-xl text-white/50 mb-10 max-w-2xl mx-auto"
           >
-            Gymia isn't just another gym software. It's a growth engine that captures demand,
-            converts leads, and keeps members engaged — all through a branded digital experience.
+            Stop spending $50K on custom apps that take months to build.
+            Gymia gives your gym a fully branded mobile app — live in days, not months.
           </motion.p>
 
           {/* Email Capture Form */}
