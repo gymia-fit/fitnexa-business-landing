@@ -28,7 +28,7 @@ jobs:
           scope: '@gymia-fit'
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
