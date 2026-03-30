@@ -22,6 +22,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 
+RUN chown -R node:node /app
+
 USER node
 
 EXPOSE 3006
