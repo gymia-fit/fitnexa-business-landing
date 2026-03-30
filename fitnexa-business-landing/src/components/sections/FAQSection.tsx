@@ -4,107 +4,95 @@ import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
-const faqs = [
+const FAQS = [
   {
-    question: 'Is Gymia really free for members?',
-    answer: 'Yes — completely free if your gym is a Gymia partner. Your gym covers the cost. No hidden fees, no credit card, no expiry. The free Member plan is yours for as long as you train there.',
+    q: 'Is Gymia really free?',
+    a: 'Yes, completely free for gym members. No subscription, no hidden fees, no credit card required — ever.',
   },
   {
-    question: 'My gym isn\'t on Gymia yet. What do I do?',
-    answer: 'Tell your gym owner about us! Share our link with them or drop your gym\'s email in the chat — our team will reach out and get them set up within days. In the meantime, the Solo plan lets you use the workout logger and AI plans independently.',
+    q: 'Does my gym need to be on Gymia?',
+    a: "Yes — your gym needs to be a Gymia partner to unlock features like class booking, community, and gym announcements. Tell your gym owner about Gymia Business (business.gymia.fit) to get them set up.",
   },
   {
-    question: 'Can I actually book classes through the app?',
-    answer: 'Yes. Browse the full class schedule, filter by time or coach, and book your spot in seconds. You\'ll get a push notification 30 minutes before class. Cancel up to 1 hour before — all from the app, no calls needed.',
+    q: 'When is the app launching?',
+    a: "We're launching on iOS and Android very soon. Join the waitlist to be the first to know and get early access.",
   },
   {
-    question: 'What does the AI workout planner actually do?',
-    answer: 'You tell it your goal (fat loss, muscle gain, strength, endurance), your current fitness level, and how many days a week you can train. It builds a custom program and updates it automatically as you log workouts and progress. It\'s like a PT that\'s always available and always watching your data.',
+    q: "What if my gym isn't on Gymia yet?",
+    a: "You can still use AI workout plans, nutrition tracking, progress photos, and streaks. Gym-specific features like class booking and community unlock once your gym joins.",
   },
   {
-    question: 'Does Gymia work for all gym types?',
-    answer: 'Yes — CrossFit boxes, yoga studios, traditional gyms, HIIT facilities, boxing gyms, Pilates. If your gym has classes or a floor, Gymia works for it.',
+    q: 'Does it work for home workouts?',
+    a: "Gymia is designed for gym-goers, but the AI workout and nutrition features work anywhere — gym, home, or hotel room.",
   },
   {
-    question: 'Can I use Gymia if my gym doesn\'t offer group classes?',
-    answer: 'Absolutely. The AI workout planner, workout logger, progress tracker, streak system, and nutrition tracker all work fully independently of class booking. The Solo plan is perfect for this.',
+    q: 'How does the Nutrition AI work?',
+    a: "Tell it your goals, body stats, and food preferences. It generates personalised weekly meal plans and tracks your daily intake automatically.",
   },
   {
-    question: 'What happens to my data if I leave my gym?',
-    answer: 'Your workout history, progress photos, PRs, and nutrition logs are yours — always. If you switch gyms, your data comes with you. If you close your account, we export everything to you in a standard format. We never hold your data hostage.',
+    q: 'Is my data private?',
+    a: "Your fitness and health data is private and never sold. Gymia earns through the in-app shop — your data stays yours.",
   },
   {
-    question: 'How is this different from apps like MyFitnessPal or Strava?',
-    answer: 'Those are great generic apps. Gymia is different because it\'s connected to your actual gym — your real schedule, your real coaches, your real community. You can book a class, log the workout your coach just ran, message your coach, and see which of your gym friends are in tonight\'s session. No other app does that.',
+    q: 'What phones does it support?',
+    a: 'Gymia will be available on iOS (iPhone) and Android at launch. Older devices are supported where possible.',
   },
 ];
 
-export function FAQSection(): React.JSX.Element {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
+function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
+  const [open, setOpen] = useState(false);
   return (
-    <section id="faq" className="py-32 bg-black relative overflow-hidden">
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-brand-500/10 rounded-full blur-[100px]" />
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      className="border-b border-white/[0.08]"
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-5 text-left gap-4 group"
+      >
+        <span className="text-white font-medium text-sm group-hover:text-brand-400 transition-colors">{q}</span>
+        <ChevronDown
+          className={`w-4 h-4 text-white/30 shrink-0 transition-transform duration-200 ${open ? 'rotate-180 text-brand-400' : ''}`}
+        />
+      </button>
+      {open && (
+        <p className="pb-5 text-white/50 text-sm leading-relaxed pr-8">{a}</p>
+      )}
+    </motion.div>
+  );
+}
 
-      <div className="relative z-10 container mx-auto px-6">
-        <div className="text-center mb-20">
-          <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-medium mb-6"
-          >
-            FAQ
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6 leading-tight"
-          >
-            Questions we{' '}
-            <span className="text-brand-400">actually get asked.</span>
-          </motion.h2>
+export function FAQSection(): React.JSX.Element {
+  return (
+    <section id="faq" className="py-28 bg-black border-t border-white/[0.05]">
+      <div className="container mx-auto px-6">
+        <div className="max-w-3xl mx-auto text-center mb-14">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-xl text-white/50 max-w-2xl mx-auto"
+            transition={{ duration: 0.5 }}
+            className="text-brand-400 font-semibold text-sm uppercase tracking-widest mb-4"
           >
-            No fluff. Just straight answers.
+            FAQ
           </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl md:text-5xl font-black text-white leading-tight"
+          >
+            Questions? We&apos;ve got answers.
+          </motion.h2>
         </div>
 
-        <div className="max-w-3xl mx-auto">
-          {faqs.map((faq, i) => (
-            <motion.div
-              key={faq.question}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.07 }}
-              className="mb-4"
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all text-left"
-              >
-                <span className="text-lg font-bold text-white pr-4">{faq.question}</span>
-                <ChevronDown
-                  className={`w-6 h-6 text-white/50 shrink-0 transition-transform ${
-                    openIndex === i ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-              {openIndex === i && (
-                <div className="px-6 pb-6 pt-2">
-                  <p className="text-white/60 leading-relaxed">{faq.answer}</p>
-                </div>
-              )}
-            </motion.div>
+        <div className="max-w-2xl mx-auto">
+          {FAQS.map((faq, i) => (
+            <FAQItem key={faq.q} q={faq.q} a={faq.a} index={i} />
           ))}
         </div>
       </div>

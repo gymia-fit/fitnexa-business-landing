@@ -1,10 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Check, Star } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, Check, Star, Smartphone } from 'lucide-react';
 
 export function HeroSection(): React.JSX.Element {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (email.trim()) setSubmitted(true);
+  }
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
       {/* Background effects */}
@@ -17,26 +25,15 @@ export function HeroSection(): React.JSX.Element {
       <div className="relative z-10 container mx-auto px-6 py-24">
         <div className="max-w-4xl mx-auto text-center">
 
-          {/* Social proof badge */}
+          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm font-medium mb-10"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm font-medium mb-10"
           >
-            <div className="flex -space-x-1.5">
-              {['JM', 'SK', 'MT', 'AL'].map((init) => (
-                <div key={init} className="w-6 h-6 rounded-full bg-brand-500 border-2 border-black flex items-center justify-center text-[8px] font-black text-white">
-                  {init}
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3 h-3 text-brand-400 fill-brand-400" />
-              ))}
-            </div>
-            <span>10,000+ members already training</span>
+            <Smartphone className="w-4 h-4 text-brand-400" />
+            <span>Coming soon on iOS & Android</span>
           </motion.div>
 
           {/* Headline */}
@@ -46,10 +43,8 @@ export function HeroSection(): React.JSX.Element {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-5xl md:text-7xl font-black text-white mb-6 leading-[1.05] tracking-tight"
           >
-            Your gym is finally{' '}
-            <span className="text-brand-400">
-              on your phone.
-            </span>
+            Your gym,{' '}
+            <span className="text-brand-400">in your pocket.</span>
           </motion.h1>
 
           {/* Sub-headline */}
@@ -59,31 +54,44 @@ export function HeroSection(): React.JSX.Element {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-xl md:text-2xl text-white/50 mb-12 max-w-2xl mx-auto leading-relaxed"
           >
-            Book classes in seconds, track every workout, and stay connected
-            with your gym — all in an app built specifically for your gym.
+            The free app that tracks your workouts, plans your nutrition with AI,
+            and connects you with your gym community.
           </motion.p>
 
-          {/* CTAs */}
+          {/* Waitlist form */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
+            className="flex flex-col items-center gap-4 mb-6"
           >
-            <Link
-              href="https://app.gymia.fit/register"
-              className="group inline-flex items-center gap-2 px-10 py-5 bg-brand-500 text-white font-bold text-lg rounded-full hover:bg-brand-400 transition-all hover:scale-105 shadow-xl shadow-brand-500/25"
-            >
-              <Sparkles className="w-5 h-5" />
-              Get Started Free
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="inline-flex items-center gap-2 px-8 py-5 bg-white/5 border border-white/10 text-white font-medium rounded-full hover:bg-white/10 transition-all text-lg"
-            >
-              See how it works →
-            </Link>
+            {submitted ? (
+              <div className="flex items-center gap-3 px-8 py-4 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-lg">
+                <Check className="w-5 h-5" />
+                You&apos;re on the list! We&apos;ll notify you at launch.
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-md">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="flex-1 w-full px-5 py-4 rounded-full bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm focus:outline-none focus:border-brand-500/50 focus:bg-white/8 transition-all"
+                />
+                <button
+                  type="submit"
+                  className="group inline-flex items-center gap-2 px-8 py-4 bg-brand-500 text-white font-bold text-sm rounded-full hover:bg-brand-400 transition-all hover:scale-105 shadow-xl shadow-brand-500/25 whitespace-nowrap"
+                >
+                  Notify Me
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </form>
+            )}
+            <p className="text-xs text-white/30 flex items-center gap-1.5">
+              🔒 No spam. We&apos;ll only email you when the app launches.
+            </p>
           </motion.div>
 
           {/* Trust checklist */}
@@ -91,15 +99,15 @@ export function HeroSection(): React.JSX.Element {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/40"
+            className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/40 mb-20"
           >
             {[
-              'Free forever for members',
-              'No credit card required',
-              '30 second setup',
+              'Free forever',
+              '10,000+ on the waitlist',
+              'iOS & Android',
             ].map((item) => (
               <span key={item} className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400" />
+                <Star className="w-3.5 h-3.5 text-brand-400 fill-brand-400" />
                 {item}
               </span>
             ))}
@@ -110,12 +118,12 @@ export function HeroSection(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.55 }}
-            className="mt-20 grid grid-cols-3 gap-px rounded-2xl overflow-hidden border border-white/10 max-w-2xl mx-auto"
+            className="grid grid-cols-3 gap-px rounded-2xl overflow-hidden border border-white/10 max-w-2xl mx-auto"
           >
             {[
-              { value: '10K+', label: 'Active Members' },
-              { value: '500+', label: 'Classes Booked Daily' },
-              { value: '4.9★', label: 'App Rating' },
+              { value: '10K+', label: 'On the waitlist' },
+              { value: '12', label: 'Features at launch' },
+              { value: '100%', label: 'Free for members' },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/5 py-5 text-center">
                 <p className="text-2xl font-black text-white">{stat.value}</p>
