@@ -105,19 +105,19 @@ jobs:
         run: |
           TAG="${{ needs.build.outputs.image-tag }}"
           TAG="${TAG##*:}"
-          helm upgrade --install business-landing \
+          helm upgrade --install landing \
             ./infra/helm/fitnexa-service \
             --namespace fitnexa \
             --set image.repository=ghcr.io/gymia-fit/fitnexa-business-landing \
             --set image.tag=$TAG \
-            -f ./infra/helm/values/business-landing.yaml \
+            -f ./infra/helm/values/landing.yaml \
             --atomic --cleanup-on-fail --wait --timeout 120s
 
       - name: Verify rollout
-        run: kubectl rollout status deployment/business-landing --namespace fitnexa --timeout 60s
+        run: kubectl rollout status deployment/landing --namespace fitnexa --timeout 60s
 
       - name: Debug on failure
         if: failure()
         run: |
-          kubectl get pods -n fitnexa -l app.kubernetes.io/name=business-landing -o wide
-          kubectl logs -n fitnexa -l app.kubernetes.io/name=business-landing --tail=100 || true
+          kubectl get pods -n fitnexa -l app.kubernetes.io/name=landing -o wide
+          kubectl logs -n fitnexa -l app.kubernetes.io/name=landing --tail=100 || true
