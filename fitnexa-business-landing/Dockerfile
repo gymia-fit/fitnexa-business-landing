@@ -15,7 +15,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3006
+ENV PORT=3005
 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -26,6 +26,6 @@ RUN chown -R node:node /app
 
 USER node
 
-EXPOSE 3006
+EXPOSE 3005
 
-CMD ["npx", "next", "start", "--port", "3006"]
+CMD ["npx", "next", "start", "--port", "3005"]
