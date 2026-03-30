@@ -29,7 +29,7 @@ export function Header(): React.JSX.Element {
               sizes="60px"
             />
           </div>
-          <span className="font-heading text-xl font-bold tracking-tight text-white">gymia.business</span>
+          <span className="font-heading text-xl font-bold tracking-tight text-white">gymia.fit</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
